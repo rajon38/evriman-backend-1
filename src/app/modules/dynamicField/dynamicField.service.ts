@@ -9,8 +9,13 @@ const createDynamicField = async (payload: DynamicField) => {
   const fieldName = toSnakeCase(payload.label);
 
   // Check if the field name already exists
-  const existingField = await prisma.dynamicField.findUnique({
-    where: { fieldName_category: { fieldName, category: payload.category } },
+  const existingField = await prisma.dynamicField.findFirst({
+    where: {
+      AND: [
+        { fieldName: fieldName },
+        { category: payload.category }
+      ]
+    },
   });
 
   if (existingField) {
@@ -46,8 +51,11 @@ const updateDynamicField = async (id: string, payload: DynamicField) => {
   const fieldName = toSnakeCase(payload.label);
 
   // Check if the field name already exists
-  const existingFieldName = await prisma.dynamicField.findUnique({
-    where: { fieldName_category: { fieldName, category: payload.category } },
+  const existingFieldName = await prisma.dynamicField.findFirst({
+    where: {
+      fieldName: fieldName,
+      category: payload.category,
+    },
   });
 
   if (existingFieldName && existingFieldName.id !== id) {

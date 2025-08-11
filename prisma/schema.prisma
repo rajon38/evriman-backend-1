@@ -464,13 +464,13 @@ model DynamicField {
   label     String
   fieldName String
   type      DynamicFieldType
+  fileType String?  @default("")// if type == file, can be "image", "audio", "video", etc.
   options   String[] // if type == select, will be an array; otherwise can be null
   status    DynamicFieldStatus
   category  DynamicFieldCategory
   createdAt DateTime             @default(now())
   updatedAt DateTime             @updatedAt
 
-  @@unique([fieldName, category])
   @@map("dynamic_field")
 }
 
@@ -531,7 +531,6 @@ model OfferCodePricingOption {
   pricingOption   PricingOption @relation("OfferCodesForPricingOption", fields: [pricingOptionId], references: [id])
   pricingOptionId String        @db.ObjectId
 
-  @@unique([offerCodeId, pricingOptionId])
   @@map("offer_code_pricing_option")
 }
 
@@ -554,7 +553,6 @@ model UserMemoryContact {
   contact      ContactList @relation(fields: [contactId], references: [id])
   contactId    String      @db.ObjectId
 
-  @@unique([userMemoryId, contactId])
   @@map("user_memory_contact")
 }
 
