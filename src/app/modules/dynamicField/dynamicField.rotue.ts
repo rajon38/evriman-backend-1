@@ -12,7 +12,7 @@ const dynamicFieldRoute = express.Router();
 dynamicFieldRoute.post(
   "/create",
   auth(UserRole.ADMIN),
-  validateRequest(dynamicFieldSchema),
+  //validateRequest(dynamicFieldSchema),
   dynamicFieldController.createDynamicField
 );
 
@@ -41,7 +41,7 @@ dynamicFieldRoute.get(
 dynamicFieldRoute.patch(
   "/:id",
   auth(UserRole.ADMIN),
-  validateRequest(dynamicFieldSchema),
+  //validateRequest(dynamicFieldSchema),
   dynamicFieldController.updateDynamicField
 );
 
