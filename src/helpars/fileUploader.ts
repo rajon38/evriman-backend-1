@@ -12,8 +12,17 @@ import { v4 as uuidv4 } from "uuid";
 
 dotenv.config();
 
-// Configure DigitalOcean Spaces
-const s3Client = new S3Client({
+// Configure AWS S3 Client
+const awsS3Client = new S3Client({
+  region: process.env.AWS_REGION || "eu-north-1",
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID || "",
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "",
+  },
+});
+
+// Configure DigitalOcean Spaces Client (keep separate for backward compatibility)
+const doSpacesClient = new S3Client({
   region: "us-east-1",
   endpoint: process.env.DO_SPACE_ENDPOINT,
   credentials: {
@@ -29,7 +38,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Multer configuration using memoryStorage (for DigitalOcean & Cloudinary)
+// Multer configuration using memoryStorage (for AWS S3 & Cloudinary)
 const storage = multer.memoryStorage();
 export const upload = multer({ storage });
 
@@ -92,7 +101,41 @@ const uploadToCloudinary = async (
   });
 };
 
-// ✅ Unchanged: DigitalOcean Upload
+// ✅ NEW: Upload to AWS S3
+const uploadToAWSS3 = async (file: Express.Multer.File) => {
+  if (!file) {
+    throw new Error("File is required for uploading.");
+  }
+
+  try {
+    const Key = `uploads/${Date.now()}_${uuidv4()}_${file.originalname}`;
+    const uploadParams = {
+      Bucket: process.env.AWS_S3_BUCKET_NAME || "",
+      Key,
+      Body: file.buffer, // Use buffer instead of file path
+      ContentType: file.mimetype,
+      // Remove ACL if bucket blocks public access
+      // ACL: "public-read" as ObjectCannedACL,
+    };
+
+    // Upload file to AWS S3
+    await awsS3Client.send(new PutObjectCommand(uploadParams));
+
+    // Format the URL
+    const fileURL = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${Key}`;
+    
+    return {
+      Location: fileURL,
+      Bucket: process.env.AWS_S3_BUCKET_NAME || "",
+      Key,
+    };
+  } catch (error) {
+    console.error("Error uploading file to AWS S3:", error);
+    throw error;
+  }
+};
+
+// ✅ DEPRECATED: Keep DigitalOcean for backward compatibility
 const uploadToDigitalOcean = async (file: Express.Multer.File) => {
   if (!file) {
     throw new Error("File is required for uploading.");
@@ -109,7 +152,7 @@ const uploadToDigitalOcean = async (file: Express.Multer.File) => {
     };
 
     // Upload file to DigitalOcean Spaces
-    await s3Client.send(new PutObjectCommand(uploadParams));
+    await doSpacesClient.send(new PutObjectCommand(uploadParams));
 
     // Format the URL
     const fileURL = `${process.env.DO_SPACE_ENDPOINT}/${process.env.DO_SPACE_BUCKET}/${Key}`;
@@ -124,7 +167,7 @@ const uploadToDigitalOcean = async (file: Express.Multer.File) => {
   }
 };
 
-// ✅ No Name Changes, Just Fixes
+// ✅ Main export with AWS S3 as default
 export const fileUploader = {
   upload,
   uploadSingle,
@@ -133,6 +176,7 @@ export const fileUploader = {
   updateProfile,
   uploadFile,
   cloudinaryUpload,
-  uploadToDigitalOcean,
+  uploadToAWSS3,
+  uploadToDigitalOcean, // Keep for backward compatibility
   uploadToCloudinary,
 };

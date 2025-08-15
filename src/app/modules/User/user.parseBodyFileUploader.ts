@@ -16,7 +16,7 @@ export const parseBodyFileUploader = catchAsync(
       throw new ApiError(400, "File is required");
     }
 
-    const image = await fileUploader.uploadToDigitalOcean(file);
+    const image = await fileUploader.uploadToAWSS3(file);
     const imageUrl = image?.Location;
 
     const userData = {

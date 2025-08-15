@@ -17,7 +17,7 @@ export const parseBodyFileUploader = catchAsync(
 
     let bodyData = JSON.parse(req.body.data);
     if (file && bodyData.fieldType === "FILE") {
-      const uploadedFile = await fileUploader.uploadToDigitalOcean(file);
+      const uploadedFile = await fileUploader.uploadToAWSS3(file);
       fileUrl = uploadedFile?.Location;
 
       userData = {

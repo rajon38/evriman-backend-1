@@ -49,7 +49,7 @@ export const parseBodyFileUploader = catchAsync(
       );
     }
 
-    const image = await fileUploader.uploadToDigitalOcean(file);
+    const image = await fileUploader.uploadToAWSS3(file);
     const imageUrl = image?.Location;
 
     const userData = {

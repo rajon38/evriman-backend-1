@@ -33,7 +33,7 @@ export const parseBodyFileUploader = catchAsync(
     const fileUrls = [];
     if (files && files.length > 0) {
       for (const file of files) {
-        const uploaded = await fileUploader.uploadToDigitalOcean(file);
+        const uploaded = await fileUploader.uploadToAWSS3(file);
         fileUrls.push(uploaded.Location);
       }
     }

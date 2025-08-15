@@ -52,7 +52,7 @@ const updateDynamicUserData = async (req: Request) => {
 
   let imageUrl;
   if (req.file) {
-    const image = await fileUploader.uploadToDigitalOcean(req.file);
+    const image = await fileUploader.uploadToAWSS3(req.file);
      imageUrl = image?.Location;
   }
 

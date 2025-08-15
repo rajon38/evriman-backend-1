@@ -1018,7 +1018,7 @@ const updateProfile = async (req: Request) => {
     throw new ApiError(404, "User not found");
   }
   if (file) {
-    image = (await fileUploader.uploadToDigitalOcean(file)).Location;
+    image = (await fileUploader.uploadToAWSS3(file)).Location;
   }
   // if (stringData) {
   //   parseData = JSON.parse(stringData);
@@ -1059,7 +1059,7 @@ const profileImageUpload = async (req: Request) => {
     throw new ApiError(404, "User not found");
   }
   if (file) {
-    image = (await fileUploader.uploadToDigitalOcean(file)).Location;
+    image = (await fileUploader.uploadToAWSS3(file)).Location;
   }
   const result = await prisma.user.update({
     where: {

@@ -47,14 +47,14 @@ export const parseBodyFileUploader = catchAsync(
     };
 
     if (files.requesterImage?.length) {
-      const uploaded = await fileUploader.uploadToDigitalOcean(
+      const uploaded = await fileUploader.uploadToAWSS3(
         files.requesterImage[0]
       );
       images.requesterImage = uploaded?.Location;
     }
 
     if (files.deathCertificate?.length) {
-      const uploaded = await fileUploader.uploadToDigitalOcean(
+      const uploaded = await fileUploader.uploadToAWSS3(
         files.deathCertificate[0]
       );
       images.deathCertificate = uploaded?.Location;

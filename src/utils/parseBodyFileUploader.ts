@@ -16,7 +16,7 @@ export const parseBodyFileUploader = catchAsync(
     if (!file && bodyData.loginType === "User") {
       throw new ApiError(400, "File is required");
     } else if (file) {
-      const image = await fileUploader.uploadToDigitalOcean(file);
+      const image = await fileUploader.uploadToAWSS3(file);
       imageUrl = image?.Location || "";
 
       if (!imageUrl) {
